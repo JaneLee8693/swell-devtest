@@ -11,6 +11,8 @@ describe('ReviewsController', () => {
 	const user2Id = 'user-2';
 	const company1Id = 'company-1';
 	const company2Id = 'company-2';
+	// const reviewIds = ['100', '101', '102'];
+
 
 	let app: INestApplication;
 	let prisma: DatabaseService;
@@ -81,7 +83,12 @@ describe('ReviewsController', () => {
 	});
 
 	describe('getReviews()', () => {
-		it.todo('should fetch all reviews');
+
+		it('should fetch all reviews', async () => {
+			const response = await request(app.getHttpServer()).get('/reviews');
+			expect(response.status).toBe(200);
+			expect(response.body.reviews).toHaveLength(3); // Update the expected count
+		  });
 
 		it.todo('should fetch reviews in descending order by date');
 
