@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ReviewsList } from './reviews-list';
 import * as reviewsData from '../../context/reviewsData'
 
@@ -51,6 +51,9 @@ describe('ReviewsList', () => {
     render(<ReviewsList />);
     await waitFor(() => screen.getByTestId('loading-msg')); // Wait for loading message to disappear
     expect(screen.getByText('Reviews:')).toBeInTheDocument();
+    expect(screen.queryByTestId('loading-msg')).not.toBeInTheDocument();
+    expect(screen.queryByText('No reviews found.')).not.toBeInTheDocument();
+    expect(screen.queryByText('Error retrieving review data. Reload the page to try again.')).not.toBeInTheDocument();
   });
 
   it('should display loading message while fetching reviews', async () => {
@@ -60,7 +63,7 @@ describe('ReviewsList', () => {
 
     render(<ReviewsList />);
     expect(screen.getByTestId('loading-msg')).toBeInTheDocument(); // Loading message should be present initially
-    await waitFor(() => screen.getByText('Reviews:')); // Wait for the title to appear
+    await waitFor(() => screen.getByText('Reviews:'));
     expect(screen.getByTestId('loading-msg')).not.toBeInTheDocument(); // Loading message should disappear
   });
 
@@ -71,6 +74,8 @@ describe('ReviewsList', () => {
     render(<ReviewsList />);
     await waitFor(() => screen.getByTestId('loading-msg'));
     expect(screen.getByText('No reviews found.')).toBeInTheDocument();
+    expect(screen.queryByTestId('loading-msg')).not.toBeInTheDocument();
+    expect(screen.queryByText('Error retrieving review data. Reload the page to try again.')).not.toBeInTheDocument();
   });
 
   it('should handle errors and display the error message', async () => {
@@ -79,5 +84,31 @@ describe('ReviewsList', () => {
     render(<ReviewsList />);
     await waitFor(() => screen.getByText('Error retrieving review data. Reload the page to try again.'));
     expect(screen.getByText('Error retrieving review data. Reload the page to try again.')).toBeInTheDocument();
+  });
+
+  it('should filter reviews based on search keyword', async () => {
+    // Mock the fetchReviews function to return a list of reviews
+    jest.spyOn(reviewsData, 'getReviews').mockResolvedValueOnce({ reviews: [mockReview1, mockReview2], error: null });
+    render(<ReviewsList />);
+    await waitFor(() => screen.getByTestId('loading-msg'));
+
+    expect(screen.getAllByTestId('review-card')).toHaveLength(2);
+
+    const searchInput = screen.getByPlaceholderText('Search reviews...');
+    fireEvent.change(searchInput, { target: { value: 'Great' } });
+
+    await waitFor(() => screen.getAllByTestId('review-card'));
+    expect(screen.getAllByTestId('review-card')).toHaveLength(1);
+  });
+
+  it('should display message if no matching reviews are found', async () => {
+    jest.spyOn(reviewsData, 'getReviews').mockResolvedValueOnce({ reviews: [mockReview1, mockReview2], error: null });
+    render(<ReviewsList />);
+    await waitFor(() => screen.getByTestId('loading-msg'));
+    const searchInput = screen.getByPlaceholderText('Search reviews...');
+
+    fireEvent.change(searchInput, { target: { value: 'NonExistentName' } });
+    await waitFor(() => screen.getByText('No matching reviews'));
+    expect(screen.getByText('No matching reviews')).toBeInTheDocument();
   });
 });
