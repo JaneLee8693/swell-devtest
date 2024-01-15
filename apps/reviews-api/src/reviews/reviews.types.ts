@@ -11,12 +11,4 @@ export interface ReviewExt extends Review {
 
 export interface ReviewsResponse {
 	reviews: ReviewExt[];
-	// id: string;
-	// reviewerId: string;
-	// companyId: string;
-	// reviewText: string;
-	// rating: number;
-	// createdOn: string;
-	// user: User;
-	// company: Company;
 }

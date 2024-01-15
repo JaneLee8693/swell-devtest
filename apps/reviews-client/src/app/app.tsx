@@ -4,6 +4,8 @@ import WebFont from 'webfontloader';
 import Header from './components/header/header';
 import ReviewsList from './components/reviews-list/reviews-list';
 import { theme } from './theme';
+import { getReviews } from './context/reviewItems';
+import React, { useEffect, useState } from 'react';
 
 WebFont.load({
 	google: {
@@ -12,11 +14,26 @@ WebFont.load({
 });
 
 export function App() {
+	const [reviews, setReviews] = useState([]);
+	useEffect(() => {
+		// Fetch reviews and update the state
+		const fetchReviews = async () => {
+		  try {
+			const response = await getReviews();
+			setReviews(response.reviews);
+		  } catch (error) {
+			console.error('Error fetching reviews', error);
+		  }
+		};
+	
+		fetchReviews();
+	  }, []);
+
 	return (
 		<ThemeProvider theme={theme}>
 			<Header />
 			<Container sx={{ mt: 2, typography: 'body1' }}>
-				<ReviewsList />
+				<ReviewsList reviews={reviews}/>
 			</Container>
 		</ThemeProvider>
 	);
