@@ -1,42 +1,57 @@
-import Alert from '@mui/material/Alert';
-import TaskIcon from '@mui/icons-material/Task';
-import React from 'react';
-import { Company, Review, User } from '@prisma/client';
+import { Alert, Typography } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import ReviewItem from '../review-item/review-item';
+import { getReviews } from '../../context/reviewsData';
 
-interface ReviewData extends Review {
-	company: Company;
-	user: User;
-}
+const styles = {
+	title: {
+		fontSize: '25pt',
+		marginBottom: '10px',
+		paddingTop: '10px',
+	},
+};
 
-/* eslint-disable-next-line */
-export interface ReviewsListProps {
-	reviews: ReviewData[];
-}
+export function ReviewsList() {
 
-export function ReviewsList(props: ReviewsListProps) {
+	const [reviews, setReviews] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState('');
 
-	const { reviews } = props;
+	useEffect(() => {
+		// Fetch reviews and update the state
+		const fetchReviews = async () => {
+		  try {
+			const response = await getReviews();
+			setReviews(response.reviews);
+		  } catch (error) {
+			console.error('Error fetching reviews', error);
+			setError('Error retrieving review data. Reload the page to try again.');
+		  }
+		  setIsLoading(false);
+		};
+	
+		fetchReviews();
+	  }, []);
 
 	return (
-		<div>
-			{reviews.length > 0 ? (
-			<div>
-				{reviews.map((review) => (
-				<div key={review.id} style={{ border: '1px solid #ddd', padding: '10px', marginBottom: '10px' }}>
-					<h3>{`Review by ${review.user.firstName} ${review.user.lastName}`}</h3>
-					<p>{`Company: ${review.company.name}`}</p>
-					<p>{`Date: ${new Date(review.createdOn).toLocaleDateString()}`}</p>
-					<p>{`Rating: ${review.rating || 'N/A'}`}</p>
-					<p>{`Review: ${review.reviewText || 'No review text available'}`}</p>
-				</div>
-				))}
-			</div>
-			) : (
-			<Alert severity="info" icon={<TaskIcon />}>
-				No reviews found.
+		<>
+			<Typography style={styles.title} variant="h1">
+			Reviews:
+			</Typography>
+			<hr></hr>
+	
+			{isLoading ? (
+			<Typography sx={{ fontSize: '14pt' }} data-testid="loading-msg">
+				Loading review data...
+			</Typography>
+			) : error ? (
+			<Alert severity="error" sx={{ width: '100%' }}>
+				{error}
 			</Alert>
+			) : (
+			<ReviewItem reviews={reviews} />
 			)}
-	  	</div>
+	  </>
 	);
 }
 
