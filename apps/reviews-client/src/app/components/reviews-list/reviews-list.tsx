@@ -46,11 +46,14 @@ export function ReviewsList() {
 
 	  useEffect(() => {
 		// Filter reviews based on the search keyword
-		const filtered = reviews.filter((review) =>
+		const filtered = Array.isArray(reviews)
+		? reviews.filter((review) =>
 		  review.user.firstName?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
 		  review.user.lastName?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-		  review.company.name.toLowerCase().includes(searchKeyword.toLowerCase())
-		);
+		  review.company.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+		  review.reviewText?.toLowerCase().includes(searchKeyword.toLowerCase())
+		) : [];
+
 		setFilteredReviews(filtered);
 	  }, [searchKeyword, reviews]);
 
@@ -60,15 +63,14 @@ export function ReviewsList() {
 			Reviews:
 			</Typography>
 			<TextField
+				sx={{ width: '90%' }}
 				style={styles.searchInput}
-				label="Search"
 				placeholder='Search reviews...'
 				variant="outlined"
-				fullWidth
 				value={searchKeyword}
 				onChange={(e) => setSearchKeyword(e.target.value)}
 			/>
-			<SearchIcon style={{ fill: '#e11979' }} />
+			<SearchIcon style={{ fill: '#e11979', marginLeft: '15px', fontSize: '30pt' }} />
 			<hr></hr>
 	
 			{isLoading ? (
@@ -82,12 +84,19 @@ export function ReviewsList() {
 			) : (
 				// eslint-disable-next-line react/jsx-no-useless-fragment
 				<>
+				{searchKeyword ? (
+				  // eslint-disable-next-line react/jsx-no-useless-fragment
+				  <>
 					{filteredReviews.length ? (
-					<ReviewItem reviews={filteredReviews} />
+					  <ReviewItem reviews={filteredReviews} />
 					) : (
-					<Typography style={styles.noMatchingReviews}>No matching reviews</Typography>
+					  <Typography style={styles.noMatchingReviews}>No matching reviews</Typography>
 					)}
-			  	</>
+				  </>
+				) : (
+				  <ReviewItem reviews={reviews} />
+				)}
+			  </>
 			)}
 	  </>
 	);
