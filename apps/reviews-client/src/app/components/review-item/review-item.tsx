@@ -1,5 +1,5 @@
 import { Alert, Card, CardContent, Typography } from '@mui/material';
-import TaskIcon from '@mui/icons-material/Task';
+import ErrorIcon from '@mui/icons-material/Error';
 import StarIcon from '@mui/icons-material/Star';
 import { Company, User, Review } from '@prisma/client';
 
@@ -89,7 +89,7 @@ export function ReviewItem(props: ReviewsProps) {
 					))}
 				</>
 			) : (
-                <Alert severity="info" icon={<TaskIcon />}>
+                <Alert severity="error" icon={<ErrorIcon />}>
                     No reviews found.
                 </Alert>
 			)}
