@@ -38,11 +38,10 @@ export function ReviewItem(props: ReviewsProps) {
 	const { reviews } = props;
 
 	return (
-		// eslint-disable-next-line react/jsx-no-useless-fragment
-		<>
-			{reviews.length ? (
-				<>
-					{reviews.map((review, index) => (
+		<div>
+			{reviews.length > 0 ? (
+				<div>
+					{reviews.map((review) => (
 						<Card
 							style={styles.card}
 							sx={{ backgroundColor: '#e2e2e3' }}
@@ -87,13 +86,13 @@ export function ReviewItem(props: ReviewsProps) {
 							</CardContent>
 						</Card>
 					))}
-				</>
+				</div>
 			) : (
                 <Alert severity="error" icon={<ErrorIcon />}>
                     No reviews found.
                 </Alert>
 			)}
-		</>
+		</div>
 	);
 }
 

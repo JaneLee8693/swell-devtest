@@ -2,7 +2,7 @@ import Container from '@mui/material/Container';
 import { ThemeProvider } from '@mui/material/styles';
 import WebFont from 'webfontloader';
 import Header from './components/header/header';
-import ReviewsList from './components/reviews-list/reviews-list';
+import ReviewsList from './components/reviews-list/ReviewsList';
 import { theme } from './theme';
 
 
